@@ -1,0 +1,27 @@
+.DS_Store
+
+# IDE settings
+.idea/
+
+# CMake and build output
+build/
+build-baseline/
+cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
+
+# Compiler and linker artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Debug symbols and profiling output
+*.dSYM/
+*.gcda
+*.gcno
+*.profraw
+*.profdata

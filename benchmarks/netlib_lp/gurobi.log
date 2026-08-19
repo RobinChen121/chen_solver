@@ -1,0 +1,43 @@
+
+Gurobi 13.0.2 (mac64[arm], gurobi_cl) logging started Sun Jul 26 21:46:55 2026
+
+Set parameter Username
+Set parameter LicenseID to value 2833447
+Set parameter LogFile to value "gurobi.log"
+Using license file /Users/zhenchen/gurobi.lic
+Academic license - for non-commercial use only - expires 2027-06-09
+
+Gurobi Optimizer version 13.0.2 build v13.0.2rc1 (mac64[arm] - Darwin 25.5.0 25F84)
+Copyright (c) 2026, Gurobi Optimization, LLC
+
+Read MPS format model from file boeing1.mps
+Reading time = 0.00 seconds
+BOEING1: 351 rows, 473 columns, 3574 nonzeros
+
+Using Gurobi shared library /Library/gurobi1302/macos_universal2/lib/libgurobi130.dylib
+
+CPU model: Apple M1 Pro
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 351 rows, 473 columns and 3574 nonzeros (Min)
+Model fingerprint: 0xf47f1e7c
+Model has 380 linear objective coefficients
+Coefficient statistics:
+  Matrix range     [1e-02, 3e+03]
+  Objective range  [1e-02, 4e+01]
+  Bounds range     [1e+00, 3e+02]
+  RHS range        [1e+00, 3e+03]
+
+Presolve removed 68 rows and 56 columns
+Presolve time: 0.00s
+Presolved: 283 rows, 418 columns, 2543 nonzeros
+
+Iteration    Objective       Primal Inf.    Dual Inf.      Time
+       0   -4.1381661e+03   6.550107e+04   0.000000e+00      0s
+     264   -3.3521357e+02   0.000000e+00   0.000000e+00      0s
+
+Solved in 264 iterations and 0.01 seconds (0.00 work units)
+Optimal objective -3.352135675e+02
+
+Wrote result file 'boeing1.lp'
+
