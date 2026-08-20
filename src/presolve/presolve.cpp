@@ -377,8 +377,8 @@ namespace chen_solver {
             }
 
             const auto new_col = report.presolved_model.addVariable(
-                variables[old_col].name, var_lb[old_col], var_ub[old_col],
-                variables[old_col].var_type);
+                var_lb[old_col], var_ub[old_col], variables[old_col].var_type,
+                variables[old_col].name);
             report.original_to_presolved_col[old_col] = new_col;
             if (std::abs(objective[old_col]) > EPS) {
                 report.presolved_model.setObjectiveCoefficient(new_col, objective[old_col]);
@@ -395,7 +395,7 @@ namespace chen_solver {
             for (const auto &term: terms) {
                 new_terms.push_back({report.original_to_presolved_col[term.col], term.coef});
             }
-            report.presolved_model.addLinearConstraint(name, new_terms, lb, ub);
+            report.presolved_model.addLinearConstraint(new_terms, lb, ub, name);
         }
 
         report.result = changed ? PresolveResult::Presolved : PresolveResult::NotPresolved;

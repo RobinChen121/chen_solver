@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "chen_solver/api/model_builder.h"
 #include "chen_solver/config.h"
 #include "linear_constraint.h"
-#include "modeling.h"
 #include "variable.h"
 
 namespace chen_solver
@@ -35,21 +35,20 @@ namespace chen_solver
         ChenUInt next_con_id = 0;
 
     public:
-        ChenInt addVariable(const std::string& name = "",
-                            double lb = 0.0,
+        ChenInt addVariable(double lb = 0.0,
                             double ub = INF,
-                            VarType var_type = VarType::Continuous);
-        Var addVar(const std::string& name = "",
-                   double lb = 0.0,
+                            VarType var_type = VarType::Continuous,
+                            const std::string& name = "");
+        Var addVar(double lb = 0.0,
                    double ub = INF,
-                   VarType var_type = VarType::Continuous);
+                   VarType var_type = VarType::Continuous,
+                   const std::string& name = "");
 
-        ChenInt addLinearConstraint(const std::string& name = "",
-                                    const std::vector<LinearTerm>& terms = {},
+        ChenInt addLinearConstraint(const std::vector<LinearTerm>& terms = {},
                                     double lb = -INF,
-                                    double ub = INF);
+                                    double ub = INF,
+                                    const std::string& name = "");
         ChenInt addConstr(const TempConstr& constraint, const std::string& name = "");
-        ChenInt addConstr(const std::string& name, const TempConstr& constraint);
 
         [[nodiscard]] std::size_t numVariables() const noexcept;
         [[nodiscard]] std::size_t numConstraints() const noexcept;

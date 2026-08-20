@@ -6,12 +6,12 @@ int main() {
     chen_solver::Model model;
     assert(model.modelStatus() == chen_solver::ModelStatus::Empty);
 
-    const auto v0 = model.addVariable("x0", 0.0, 1.0, chen_solver::VarType::Binary);
+    const auto v0 = model.addVariable(0.0, 1.0, chen_solver::VarType::Binary, "x0");
     assert(v0 == 0);
     assert(model.numVariables() == 1);
     assert(model.modelStatus() == chen_solver::ModelStatus::Modified);
 
-    const auto c0 = model.addLinearConstraint("cover", {{0, 1.0}}, 1.0, chen_solver::INF);
+    const auto c0 = model.addLinearConstraint({{0, 1.0}}, 1.0, chen_solver::INF, "cover");
     assert(c0 == 0);
     assert(model.numConstraints() == 1);
     assert(model.checkValid());

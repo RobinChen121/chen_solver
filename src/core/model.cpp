@@ -9,8 +9,8 @@
 #include <utility>
 
 namespace chen_solver {
-    ChenInt Model::addVariable(const std::string &name, const double lb, const double ub,
-                               const VarType var_type) {
+    ChenInt Model::addVariable(const double lb, const double ub,
+                               const VarType var_type, const std::string &name) {
         next_var_id = variables_.size();
         const std::string actual_name = name.empty() ? "x" + std::to_string(next_var_id) : name;
 
@@ -27,15 +27,14 @@ namespace chen_solver {
         return col;
     }
 
-    Var Model::addVar(const std::string &name, const double lb, const double ub,
-                      const VarType var_type) {
-        return Var(addVariable(name, lb, ub, var_type));
+    Var Model::addVar(const double lb, const double ub, const VarType var_type, const std::string &name) {
+        return Var(addVariable(lb, ub, var_type, name));
     }
 
-    ChenInt Model::addLinearConstraint(const std::string &name,
-                                       const std::vector<LinearTerm> &terms,
+    ChenInt Model::addLinearConstraint(const std::vector<LinearTerm> &terms,
                                        const double lb,
-                                       const double ub) {
+                                       const double ub,
+                                       const std::string &name) {
         next_con_id = constraints_.size();
         const std::string actual_name = name.empty() ? "c" + std::to_string(next_con_id) : name;
 
@@ -82,11 +81,7 @@ namespace chen_solver {
             ub -= constant;
         }
 
-        return addLinearConstraint(name, constraint.expression().terms(), lb, ub);
-    }
-
-    ChenInt Model::addConstr(const std::string &name, const TempConstr &constraint) {
-        return addConstr(constraint, name);
+        return addLinearConstraint(constraint.expression().terms(), lb, ub, name);
     }
 
     std::size_t Model::numVariables() const noexcept {
@@ -156,7 +151,7 @@ namespace chen_solver {
         if (it != name_to_varIndex.end())
             return it->second;
 
-        addVariable(name);
+        addVariable(0.0, INF, VarType::Continuous, name);
         return static_cast<ChenInt>(variables_.size() - 1);
     }
 

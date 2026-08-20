@@ -324,14 +324,14 @@ namespace chen_solver {
             const int sense = operator_ == "<=" ? 0 : (operator_ == ">=" ? 1 : 2);
 
             if (sense == 0)
-                model.addLinearConstraint(con_name, parseLinearExpression(lhs_text, model), -INF,
-                                          rhs);
+                model.addLinearConstraint(parseLinearExpression(lhs_text, model), -INF, rhs,
+                                          con_name);
             else if (sense == 1)
-                model.addLinearConstraint(con_name, parseLinearExpression(lhs_text, model), rhs,
-                                          INF);
+                model.addLinearConstraint(parseLinearExpression(lhs_text, model), rhs, INF,
+                                          con_name);
             else
-                model.addLinearConstraint(con_name, parseLinearExpression(lhs_text, model), rhs,
-                                          rhs);
+                model.addLinearConstraint(parseLinearExpression(lhs_text, model), rhs, rhs,
+                                          con_name);
 
             // 解析完成后清空缓冲区
             text.clear();
@@ -676,7 +676,7 @@ namespace chen_solver {
                 type = VarType::Integer;
 
             std::string name = col_name;
-            model.addVariable(name, lb, ub, type);
+            model.addVariable(lb, ub, type, name);
         }
 
         //----------------------------------------
@@ -744,7 +744,7 @@ namespace chen_solver {
             }
 
             if (type != 'N') {
-                model.addLinearConstraint(name, terms, lhs_bound, rhs_bound);
+                model.addLinearConstraint(terms, lhs_bound, rhs_bound, name);
             }
         }
 

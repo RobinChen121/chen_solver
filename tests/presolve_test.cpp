@@ -6,12 +6,12 @@ int main() {
     {
         chen_solver::Model model;
         model.setObjectiveSense(chen_solver::ObjSense::Minimize);
-        const auto x = model.addVariable("x", 1.0, 1.0);
-        const auto y = model.addVariable("y", 0.0, 10.0);
-        const auto z = model.addVariable("z", 0.0, 10.0);
+        const auto x = model.addVariable(1.0, 1.0, chen_solver::VarType::Continuous, "x");
+        const auto y = model.addVariable(0.0, 10.0, chen_solver::VarType::Continuous, "y");
+        const auto z = model.addVariable(0.0, 10.0, chen_solver::VarType::Continuous, "z");
         model.setObjectiveCoefficient(x, 2.0);
         model.setObjectiveCoefficient(y, 3.0);
-        model.addLinearConstraint("cap", {{x, 1.0}, {y, 1.0}, {z, 1.0}}, -chen_solver::INF, 5.0);
+        model.addLinearConstraint({{x, 1.0}, {y, 1.0}, {z, 1.0}}, -chen_solver::INF, 5.0, "cap");
 
         const auto report = chen_solver::presolveLinearProgram(model);
         assert(report.result == chen_solver::PresolveResult::Presolved);
@@ -40,8 +40,8 @@ int main() {
 
     {
         chen_solver::Model model;
-        const auto x = model.addVariable("x", 0.0, 1.0);
-        model.addLinearConstraint("need_more", {{x, 1.0}}, 2.0, chen_solver::INF);
+        const auto x = model.addVariable(0.0, 1.0, chen_solver::VarType::Continuous, "x");
+        model.addLinearConstraint({{x, 1.0}}, 2.0, chen_solver::INF, "need_more");
 
         const auto report = chen_solver::presolveLinearProgram(model);
         assert(report.result == chen_solver::PresolveResult::PrimalInfeasible);
@@ -50,7 +50,7 @@ int main() {
     {
         chen_solver::Model model;
         model.setObjectiveSense(chen_solver::ObjSense::Minimize);
-        model.addVariable("x", 0.0, chen_solver::INF);
+        model.addVariable(0.0, chen_solver::INF, chen_solver::VarType::Continuous, "x");
         model.setObjectiveCoefficient(0, -1.0);
 
         const auto report = chen_solver::presolveLinearProgram(model);

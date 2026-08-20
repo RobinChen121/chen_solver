@@ -4,14 +4,14 @@
 
 int main() {
     chen_solver::Model model;
-    const auto x = model.addVar("x", 0.0, 10.0);
-    const auto y = model.addVar("y", 1.0, 9.0);
+    const auto x = model.addVar(0.0, 10.0, chen_solver::VarType::Continuous, "x");
+    const auto y = model.addVar(1.0, 9.0, chen_solver::VarType::Continuous, "y");
 
     model.setObjective(2.0 * x + y + 5.0, chen_solver::ObjSense::Maximize);
 
-    const auto c0 = model.addConstr("cap", 2.0 * x + 3.0 * y <= 10.0);
+    const auto c0 = model.addConstr(2.0 * x + 3.0 * y <= 10.0, "cap");
     const auto c1 = model.addConstr(x - y == 1.0);
-    const auto c2 = model.addConstr("rng", chen_solver::range(-1.0, x + y + 2.0, 4.0));
+    const auto c2 = model.addConstr(chen_solver::range(-1.0, x + y + 2.0, 4.0), "rng");
     const auto c3 = model.addConstr(3.0 <= x + y);
 
     assert(c0 == 0);
