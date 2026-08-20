@@ -1,12 +1,14 @@
 #ifndef CHEN_SOLVER_MODEL_H
 #define CHEN_SOLVER_MODEL_H
 
+#include <cmath>
 #include <map>
 #include <string>
 #include <vector>
 
 #include "chen_solver/config.h"
 #include "linear_constraint.h"
+#include "modeling.h"
 #include "variable.h"
 
 namespace chen_solver
@@ -37,15 +39,26 @@ namespace chen_solver
                             double lb = 0.0,
                             double ub = INF,
                             VarType var_type = VarType::Continuous);
+        Var addVar(const std::string& name = "",
+                   double lb = 0.0,
+                   double ub = INF,
+                   VarType var_type = VarType::Continuous);
 
         ChenInt addLinearConstraint(const std::string& name = "",
                                     const std::vector<LinearTerm>& terms = {},
                                     double lb = -INF,
                                     double ub = INF);
+        ChenInt addConstr(const TempConstr& constraint, const std::string& name = "");
+        ChenInt addConstr(const std::string& name, const TempConstr& constraint);
 
         [[nodiscard]] std::size_t numVariables() const noexcept;
         [[nodiscard]] std::size_t numConstraints() const noexcept;
         [[nodiscard]] ModelStatus modelStatus() const noexcept;
+        [[nodiscard]] const std::vector<Variable>& variables() const noexcept { return variables_; }
+        [[nodiscard]] const std::vector<LinearConstraint>& constraints() const noexcept { return constraints_; }
+        [[nodiscard]] ObjSense objectiveSense() const noexcept { return objective_sense_; }
+        [[nodiscard]] const std::map<ChenInt, double>& objectiveCoefficients() const noexcept { return objective_coef; }
+        [[nodiscard]] double objectiveOffset() const noexcept { return objective_offset; }
 
         void setVariableLb(const ChenInt col, const double lb)
         {
@@ -82,9 +95,23 @@ namespace chen_solver
 
         void setObjectiveCoefficient(const ChenInt col, const double coef)
         {
-            objective_coef[col] = coef;
+            if (std::abs(coef) <= EPS)
+            {
+                objective_coef.erase(col);
+            }
+            else
+            {
+                objective_coef[col] = coef;
+            }
             status_ = ModelStatus::Modified;
         };
+
+        void setObjectiveOffset(const double offset)
+        {
+            objective_offset = offset;
+            status_ = ModelStatus::Modified;
+        };
+        void setObjective(const LinExpr& expression, ObjSense sense = ObjSense::Minimize);
 
         void setModelName(const std::string& name)
         {

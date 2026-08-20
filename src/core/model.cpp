@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <ranges>
 #include <stdexcept>
 #include <utility>
 
@@ -24,6 +25,11 @@ namespace chen_solver {
         name_to_varIndex[variables_.back().name] = col;
         status_ = ModelStatus::Modified;
         return col;
+    }
+
+    Var Model::addVar(const std::string &name, const double lb, const double ub,
+                      const VarType var_type) {
+        return Var(addVariable(name, lb, ub, var_type));
     }
 
     ChenInt Model::addLinearConstraint(const std::string &name,
@@ -64,6 +70,25 @@ namespace chen_solver {
         return static_cast<ChenInt>(constraints_.size() - 1);
     }
 
+    ChenInt Model::addConstr(const TempConstr &constraint, const std::string &name) {
+        double lb = constraint.lb();
+        double ub = constraint.ub();
+        const double constant = constraint.expression().constant();
+
+        if (lb > -INF / 2) {
+            lb -= constant;
+        }
+        if (ub < INF / 2) {
+            ub -= constant;
+        }
+
+        return addLinearConstraint(name, constraint.expression().terms(), lb, ub);
+    }
+
+    ChenInt Model::addConstr(const std::string &name, const TempConstr &constraint) {
+        return addConstr(constraint, name);
+    }
+
     std::size_t Model::numVariables() const noexcept {
         return variables_.size();
     }
@@ -76,12 +101,33 @@ namespace chen_solver {
         return status_;
     }
 
+    void Model::setObjective(const LinExpr &expression, const ObjSense sense) {
+        objective_sense_ = sense;
+        objective_offset = expression.constant();
+        objective_coef.clear();
+
+        std::map<ChenInt, double> merged_terms;
+        for (const auto &[col, coef]: expression.terms()) {
+            if (col < 0 || static_cast<std::size_t>(col) >= variables_.size())
+                throw std::out_of_range("Invalid variable index in objective");
+            merged_terms[col] += coef;
+        }
+
+        for (const auto &[col, coef]: merged_terms) {
+            if (std::abs(coef) > EPS) {
+                objective_coef[col] = coef;
+            }
+        }
+
+        status_ = ModelStatus::Modified;
+    }
+
     [[nodiscard]] bool Model::checkValid() const {
-        if (std::any_of(variables_.begin(), variables_.end(),
-                        [](const auto &c) { return c.lb > c.ub; }))
+        if (std::ranges::any_of(variables_,
+                                [](const auto &c) { return c.lb > c.ub; }))
             return false;
-        if (std::any_of(constraints_.begin(), constraints_.end(),
-                        [](const auto &c) { return c.lb > c.ub; }))
+        if (std::ranges::any_of(constraints_,
+                                [](const auto &c) { return c.lb > c.ub; }))
             return false;
         for (auto const &con: constraints_) {
             for (const auto &[col, coef]: con.lhs) {
@@ -89,7 +135,7 @@ namespace chen_solver {
                     return false;
             }
         }
-        for (const auto &[col, coef]: objective_coef) {
+        for (const auto &col: objective_coef | std::views::keys) {
             if (col < 0 || static_cast<std::size_t>(col) >= variables_.size())
                 return false;
         }
@@ -171,6 +217,16 @@ namespace chen_solver {
             counter++;
             if (counter % 3 == 0)
                 std::cout << "\n      ";
+            first = false;
+        }
+
+        if (std::abs(objective_offset) > 1e-12) {
+            if (!first) {
+                std::cout << (objective_offset >= 0 ? " + " : " - ");
+            } else if (objective_offset < 0) {
+                std::cout << "-";
+            }
+            std::cout << std::abs(objective_offset);
             first = false;
         }
 

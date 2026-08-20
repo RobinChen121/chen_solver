@@ -6,7 +6,7 @@
  *
  */
 
-#include "chen_solver/read_file.h"
+#include "chen_solver/io/read_file.h"
 
 #include <cctype>
 #include <cmath>
@@ -15,7 +15,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "chen_solver/model.h"
+#include "chen_solver/core/model.h"
 
 namespace chen_solver {
     Model read(const std::string &path) {

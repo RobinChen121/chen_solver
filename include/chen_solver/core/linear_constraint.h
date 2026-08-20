@@ -10,7 +10,7 @@
 namespace chen_solver {
 
 struct LinearConstraint {
-    ConId id{};
+    ChenUInt id{};
     std::string name;
     std::vector<LinearTerm> lhs;
     double lb{-INF};

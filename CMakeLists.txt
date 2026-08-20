@@ -8,8 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON) # 要求编译器必须支持 C++20，禁止
 set(CMAKE_CXX_EXTENSIONS OFF) # 关闭编译器扩展（如 gnu++20），保持跨平台一致性
 
 option(CHEN_SOLVER_BUILD_EXAMPLES "Build example programs" ON) # 提供开关控制是否构建 examples
+# 开启编译器警告意味着编译器会更严格地提示例如：未使用变量 / 未使用参数；有符号和无符号比较；可能有问题的类型转换；
+#不太标准或不够规范的写法；某些潜在 bug
 option(CHEN_SOLVER_ENABLE_WARNINGS "Enable compiler warnings" ON) # 提供开关控制是否启用编译警告
 
+# cmake 中的函数定义语法为 function(<name> [arg1 [arg2 ...]] <body> endfunction())
+# 小括号中第一个为函数名，之后为参数列表，函数体中可以使用 ${arg1}、${arg2} 等访问参数值
 function(chen_solver_enable_warnings target_name) # 定义一个辅助函数，为指定目标统一开启编译警告
     if (NOT CHEN_SOLVER_ENABLE_WARNINGS) # 如果用户关闭了警告开关，则直接跳过
         return() # 提前返回，不对目标添加任何警告选项
@@ -26,6 +30,7 @@ add_library(chen_solver_core # 创建核心静态库目标 chen_solver_core，�
         src/core/model.cpp # 将模型核心实现编译进库
         src/io/read_file.cpp # 将 LP/MPS 读取实现编译进库
         src/presolve/presolve.cpp # 将预处理实现编译进库
+        src/util/logger.cpp # 将日志工具实现编译进库
 ) # 结束库目标源文件列表
 add_library(chen_solver::core ALIAS chen_solver_core) # 为核心库创建命名空间别名，方便外部统一链接
 target_include_directories(chen_solver_core # 为 chen_solver_core 设置头文件搜索路径
@@ -50,14 +55,37 @@ if (CHEN_SOLVER_BUILD_EXAMPLES) # 当开关开启时构建示例程序
     chen_solver_enable_warnings(chen_solver_basic_example) # 为示例目标启用统一警告策略
 endif () # 结束示例构建条件
 
+# 测试相关配置
+# CTest 是 CMake 自带的测试框架，提供了 BUILD_TESTING 选项和 add_test() 命令
 include(CTest) # 启用 CTest 测试框架支持（提供 BUILD_TESTING 选项）
 if (BUILD_TESTING) # 当测试开关开启时构建并注册测试
-    add_executable(chen_solver_model_smoke_test # 创建轻量 smoke test 可执行目标
-            tests/model_smoke_test.cpp # smoke test 源文件
+    add_executable(chen_solver_model_test # 创建test 可执行目标
+            tests/model_test.cpp # smoke test 源文件
     ) # 结束测试可执行目标源文件列表
-    target_link_libraries(chen_solver_model_smoke_test PRIVATE chen_solver::core) # 测试程序私有链接核心库
-    chen_solver_enable_warnings(chen_solver_model_smoke_test) # 为测试目标启用统一警告策略
-    add_test(NAME model_smoke_test COMMAND chen_solver_model_smoke_test) # 向 CTest 注册测试用例
+    target_link_libraries(chen_solver_model_test PRIVATE chen_solver::core) # 测试程序私有链接核心库
+    chen_solver_enable_warnings(chen_solver_model_test) # 为测试目标启用统一警告策略
+    add_test(NAME model_test COMMAND chen_solver_model_test) # 向 CTest 注册测试用例
+
+    add_executable(chen_solver_presolve_test
+            tests/presolve_test.cpp
+    )
+    target_link_libraries(chen_solver_presolve_test PRIVATE chen_solver::core)
+    chen_solver_enable_warnings(chen_solver_presolve_test)
+    add_test(NAME presolve_test COMMAND chen_solver_presolve_test)
+
+    add_executable(chen_solver_logger_test
+            tests/logger_test.cpp
+    )
+    target_link_libraries(chen_solver_logger_test PRIVATE chen_solver::core)
+    chen_solver_enable_warnings(chen_solver_logger_test)
+    add_test(NAME logger_test COMMAND chen_solver_logger_test)
+
+    add_executable(chen_solver_modeling_dsl_test
+            tests/modeling_dsl_test.cpp
+    )
+    target_link_libraries(chen_solver_modeling_dsl_test PRIVATE chen_solver::core)
+    chen_solver_enable_warnings(chen_solver_modeling_dsl_test)
+    add_test(NAME modeling_dsl_test COMMAND chen_solver_modeling_dsl_test)
 endif () # 结束测试构建条件
 
 install(TARGETS chen_solver_core chen_solver # 安装核心库和 CLI 可执行文件

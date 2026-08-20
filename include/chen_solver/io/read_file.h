@@ -11,7 +11,7 @@
 
 #include <string>
 
-#include "chen_solver/model.h"
+#include "chen_solver/core/model.h"
 
 namespace chen_solver {
     Model readLP(const std::string &path);

@@ -8,7 +8,7 @@
 namespace chen_solver {
 
 struct Variable {
-    VarId id{};
+    ChenUInt id{};
     std::string name;
     double lb{0.0};
     double ub{INF};
