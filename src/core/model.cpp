@@ -1,12 +1,15 @@
-#include "chen_solver/model.h"
+#include "../../include/chen_solver/core/model.h"
 
-
+#include <algorithm>
+#include <cmath>
 #include <iostream>
+#include <map>
+#include <stdexcept>
 #include <utility>
 
 namespace chen_solver {
-    void Model::addVariable(const std::string &name, const double lb, const double ub,
-                            const VarType var_type) {
+    ChenInt Model::addVariable(const std::string &name, const double lb, const double ub,
+                               const VarType var_type) {
         next_var_id = variables_.size();
         const std::string actual_name = name.empty() ? "x" + std::to_string(next_var_id) : name;
 
@@ -20,11 +23,13 @@ namespace chen_solver {
 
         name_to_varIndex[variables_.back().name] = col;
         status_ = ModelStatus::Modified;
-    };
+        return col;
+    }
 
-    void Model::addLinearConstraint(const std::string &name, const std::vector<LinearTerm> &terms,
-                                    const double lb,
-                                    const double ub) {
+    ChenInt Model::addLinearConstraint(const std::string &name,
+                                       const std::vector<LinearTerm> &terms,
+                                       const double lb,
+                                       const double ub) {
         next_con_id = constraints_.size();
         const std::string actual_name = name.empty() ? "c" + std::to_string(next_con_id) : name;
 
@@ -41,6 +46,8 @@ namespace chen_solver {
         // 合并重复列，类似这种情况 2x_1 + 3x_1 + 4x_2 >= 10
         std::map<ChenInt, double> coeffs;
         for (const auto &[col, coef]: terms) {
+            if (col < 0 || static_cast<std::size_t>(col) >= variables_.size())
+                throw std::out_of_range("Invalid variable index in linear constraint");
             coeffs[col] += coef;
         }
 
@@ -52,8 +59,9 @@ namespace chen_solver {
         }
 
         constraints_.push_back(std::move(con));
-        name_to_conIndex[name] = static_cast<ChenInt>(constraints_.size() - 1);
+        name_to_conIndex[actual_name] = static_cast<ChenInt>(constraints_.size() - 1);
         status_ = ModelStatus::Modified;
+        return static_cast<ChenInt>(constraints_.size() - 1);
     }
 
     std::size_t Model::numVariables() const noexcept {
@@ -69,15 +77,21 @@ namespace chen_solver {
     }
 
     [[nodiscard]] bool Model::checkValid() const {
-        if (std::ranges::any_of(variables_, [](const auto &c) { return c.lb > c.ub; }))
+        if (std::any_of(variables_.begin(), variables_.end(),
+                        [](const auto &c) { return c.lb > c.ub; }))
             return false;
-        if (std::ranges::all_of(constraints_, [](const auto &c) { return c.lb < c.ub; }))
+        if (std::any_of(constraints_.begin(), constraints_.end(),
+                        [](const auto &c) { return c.lb > c.ub; }))
             return false;
         for (auto const &con: constraints_) {
             for (const auto &[col, coef]: con.lhs) {
-                if (col < 0 || col >= variables_.size())
+                if (col < 0 || static_cast<std::size_t>(col) >= variables_.size())
                     return false;
             }
+        }
+        for (const auto &[col, coef]: objective_coef) {
+            if (col < 0 || static_cast<std::size_t>(col) >= variables_.size())
+                return false;
         }
         return true;
     }
@@ -98,6 +112,15 @@ namespace chen_solver {
 
         addVariable(name);
         return static_cast<ChenInt>(variables_.size() - 1);
+    }
+
+    void Model::print() const {
+        printObjective();
+        printConstraints();
+        printBounds();
+        printIntegers();
+        printBinaries();
+        std::cout << "End\n";
     }
 
     void Model::printLinearExpression(const std::vector<LinearTerm> &terms) const {

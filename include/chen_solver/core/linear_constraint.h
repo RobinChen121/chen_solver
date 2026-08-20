@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "chen_solver/config.h"
-#include "chen_solver/linear_term.h"
+#include "linear_term.h"
 
 namespace chen_solver {
 

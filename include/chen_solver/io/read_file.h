@@ -1,7 +1,7 @@
 /*
  * Created by Zhen Chen on 2026/8/19.
  * Email: chen.zhen5526@gmail.com
- * Description: 
+ * Description:
  *
  *
  */
@@ -10,6 +10,7 @@
 #define CHEN_SOLVER_READ_FILE_H
 
 #include <string>
+
 #include "chen_solver/model.h"
 
 namespace chen_solver {

@@ -6,10 +6,14 @@
  *
  */
 
-#include "read_file.h"
+#include "chen_solver/read_file.h"
 
+#include <cctype>
+#include <cmath>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 
 #include "chen_solver/model.h"
 

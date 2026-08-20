@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "chen_solver/model.h"
+#include "../include/chen_solver/core/model.h"
 
 int main() {
     chen_solver::Model model;
@@ -8,11 +8,12 @@ int main() {
 
     const auto v0 = model.addVariable("x0", 0.0, 1.0, chen_solver::VarType::Binary);
     assert(v0 == 0);
-    assert(model.num_variables() == 1);
+    assert(model.numVariables() == 1);
     assert(model.modelStatus() == chen_solver::ModelStatus::Modified);
 
     const auto c0 = model.addLinearConstraint("cover", {{0, 1.0}}, 1.0, chen_solver::INF);
     assert(c0 == 0);
     assert(model.numConstraints() == 1);
+    assert(model.checkValid());
     return 0;
 }
