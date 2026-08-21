@@ -27,7 +27,8 @@ namespace chen_solver {
         return col;
     }
 
-    Var Model::addVar(const double lb, const double ub, const VarType var_type, const std::string &name) {
+    Var Model::addVar(const double lb, const double ub, const VarType var_type,
+                      const std::string &name) {
         return Var(addVariable(lb, ub, var_type, name));
     }
 
@@ -307,5 +308,9 @@ namespace chen_solver {
                 std::cout << " " << var.name << "\n";
 
         std::cout << "\n";
+    }
+
+    void Model::solve() {
+        return;
     }
 } // namespace chen_solver
