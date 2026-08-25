@@ -1,3 +1,11 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/25, 17:01
+ * Description: 
+ *
+ */
+
 #include <cassert>
 
 #include "../include/chen_solver/core/model.h"

@@ -1,3 +1,11 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/25, 17:01
+ * Description: Domain Specific Language (DSL) for modeling.
+ *
+ */
+
 #include <cassert>
 
 #include "chen_solver/core/model.h"

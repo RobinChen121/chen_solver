@@ -1,3 +1,11 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/20, 13:03
+ * Description: 
+ *
+ */
+
 #ifndef CHEN_SOLVER_MODEL_H
 #define CHEN_SOLVER_MODEL_H
 
@@ -6,7 +14,7 @@
 #include <string>
 #include <vector>
 
-#include "chen_solver/api/model_builder.h"
+#include "chen_solver/api/model_builder_cpp.h"
 #include "chen_solver/config.h"
 #include "linear_constraint.h"
 #include "variable.h"

@@ -1,3 +1,19 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/25, 17:01
+ * Description: 
+ *
+ */
+
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ P26/08/20, 13:03
+ * Description: 
+ *
+ */
+
 #include <iostream>
 
 #include "../include/chen_solver/core/model.h"

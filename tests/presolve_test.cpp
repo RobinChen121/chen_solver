@@ -1,9 +1,16 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/25, 17:01
+ * Description: 
+ *
+ */
+
 #include <cassert>
 
 #include "chen_solver/presolve/presolve.h"
 
-int main() {
-    {
+int main() { {
         chen_solver::Model model;
         model.setObjectiveSense(chen_solver::ObjSense::Minimize);
         const auto x = model.addVariable(1.0, 1.0, chen_solver::VarType::Continuous, "x");
@@ -36,18 +43,14 @@ int main() {
         assert(cons[0].lhs[0].col == 0);
         assert(cons[0].lhs[1].col == 1);
         assert(cons[0].ub == 4.0);
-    }
-
-    {
+    } {
         chen_solver::Model model;
         const auto x = model.addVariable(0.0, 1.0, chen_solver::VarType::Continuous, "x");
         model.addLinearConstraint({{x, 1.0}}, 2.0, chen_solver::INF, "need_more");
 
         const auto report = chen_solver::presolveLinearProgram(model);
         assert(report.result == chen_solver::PresolveResult::PrimalInfeasible);
-    }
-
-    {
+    } {
         chen_solver::Model model;
         model.setObjectiveSense(chen_solver::ObjSense::Minimize);
         model.addVariable(0.0, chen_solver::INF, chen_solver::VarType::Continuous, "x");

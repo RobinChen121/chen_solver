@@ -1,7 +1,7 @@
 /**
  * Author: Zhen Chen
  * Email: chen.zhen5526@gmail.com
- * Created on: 2026/8/19, 23:43
+ * Created on: 2026/08/20, 17:01
  * Description: Compressed Sparse format for sparse matrix representation:
  * CSC (Compressed Sparse Column) format  or CSR (Compressed Sparse Row)
  * is a widely used data structure for efficiently storing and manipulating sparse matrices.
@@ -13,6 +13,7 @@
  *
  * 
  */
+
 
 #ifndef CHEN_SOLVER_MATRIX_H
 #define CHEN_SOLVER_MATRIX_H
@@ -30,20 +31,22 @@
 // col_ptr = {0, 1, 2, 3, 5}, col[i+1]-col[i] equals the number of non-zeros in column i
 
 namespace chen_solver {
-struct CSC {
-    std::vector<double> values{};       // non zeros values
-    std::vector<ChenInt> row_indices{}; // row indices for the non-zero values
-    // col_ptr 的个数为列数加 1
-    // 记录每一列的第一个非零元素在 values 数组中的起始位置（索引）
-    std::vector<ChenInt> col_ptr{}; // start and end indices in the non-zero values in each column
+    struct CSC {
+        std::vector<double> values{}; // non zeros values
+        std::vector<ChenInt> row_indices{}; // row indices for the non-zero values
+        // col_ptr 的个数为列数加 1
+        // 记录每一列的第一个非零元素在 values 数组中的起始位置（索引）
+        std::vector<ChenInt> col_ptr{};
+        // start and end indices in the non-zero values in each column
 
-    CSC() = default; // 空对象方便临时使用
-    // num_non_zero = 预计非零元素个数
-    // num_col = 矩阵列数
-    // 工业级时最好估计非零个数，从而提前分配内存
-    // array 也可以直接用数值初始化，此时元素都为 0
-    CSC(const ChenInt num_non_zero, const ChenInt num_col)
-        : values(num_non_zero), row_indices(num_non_zero), col_ptr(num_col + 1) {}
-};
+        CSC() = default; // 空对象方便临时使用
+        // num_non_zero = 预计非零元素个数
+        // num_col = 矩阵列数
+        // 工业级时最好估计非零个数，从而提前分配内存
+        // array 也可以直接用数值初始化，此时元素都为 0
+        CSC(const ChenInt num_non_zero, const ChenInt num_col)
+            : values(num_non_zero), row_indices(num_non_zero), col_ptr(num_col + 1) {
+        }
+    };
 } // namespace chen_solver
 #endif //CHEN_SOLVER_MATRIX_H

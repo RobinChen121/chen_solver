@@ -1,7 +1,7 @@
 /**
  * Author: Zhen Chen
  * Email: chen.zhen5526@gmail.com
- * Created on: 2026/8/20, 1:12
+ * Created on: 2026/08/20, 13:03
  * Description: general model class for the models in the text books
  * 
  */
@@ -13,14 +13,12 @@
 
 #include "chen_solver/core/matrix.h"
 
-namespace chen_solver
-{
-    struct SimplexTableau
-    {
+namespace chen_solver {
+    struct SimplexTableau {
         int phase{};
         int iteration{};
         std::vector<int> basis;
-        std::vector<std::vector<double>> coefficients;
+        std::vector<std::vector<double> > coefficients;
         std::vector<double> rhs;
         std::vector<double> reduced_costs;
         double objective_value{};
@@ -28,13 +26,12 @@ namespace chen_solver
         int leaving_row{-1};
     };
 
-    class ModelTextbook
-    {
+    class ModelTextbook {
         // input parameters
         std::vector<double> obj_coe; // objective coefficients
         int obj_sense{}; // 0:min, 1: max
         int original_obj_sense{}; // keep the user's objective sense for reporting
-        std::vector<std::vector<double>> con_lhs;
+        std::vector<std::vector<double> > con_lhs;
         std::vector<double> con_rhs;
         std::vector<int> constraint_sense; // 0:<=, 1: >=, 2: =
         std::vector<int> var_sign; // 0: >=, 1: <=, 2: unsigned
@@ -81,11 +78,11 @@ namespace chen_solver
         bool save_tableau_history = false;
         std::vector<SimplexTableau> tableau_history;
 
-
     public:
         ModelTextbook(const int obj_sense, const std::vector<double> &obj_coe,
-                    const std::vector<std::vector<double>> &con_lhs, const std::vector<double> &con_rhs,
-                    const std::vector<int> &constraint_sense, const std::vector<int> &var_sign)
+                      const std::vector<std::vector<double> > &con_lhs,
+                      const std::vector<double> &con_rhs,
+                      const std::vector<int> &constraint_sense, const std::vector<int> &var_sign)
             : obj_coe(obj_coe), obj_sense(obj_sense), con_lhs(con_lhs), con_rhs(con_rhs),
               constraint_sense(constraint_sense), var_sign(var_sign) {
             m = static_cast<int>(con_lhs.size());

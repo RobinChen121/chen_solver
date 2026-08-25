@@ -1,3 +1,11 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/25, 17:01
+ * Description: 
+ *
+ */
+
 #include <iostream>
 
 #include "include/chen_solver/core/model.h"
@@ -10,6 +18,6 @@ int main() {
     model.addConstr(x0 + x1 >= 2.0, "c0");
 
     std::cout << "chen_solver_cli: vars=" << model.numVariables()
-              << ", cons=" << model.numConstraints() << '\n';
+            << ", cons=" << model.numConstraints() << '\n';
     return 0;
 }

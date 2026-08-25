@@ -100,8 +100,8 @@ endif () # 结束测试构建条件
 # 前提是用 cmake -S . -B build/ 生成了构建文件，cmake --build build/ 编译了构建产物
 # 然后在他们的 CMakeLists.txt 中使用 find_package() 找到这个包并链接使用
 
-# 使用顺序为：cmake -S . -B build
-# cmake --build build
+# 使用顺序为：cmake -S . -B build 配置项目
+# cmake --build build 编译项目
 # cmake --install build
 
 # 有时候上述命令会报错，可能因为当前电脑有多个 clang (例如anaconda里也包含clang) 或 gcc 版本，导致 cmake 找不到正确的编译器

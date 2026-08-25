@@ -1,14 +1,19 @@
+/**
+ * Author: Zhen Chen
+ * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/20, 21:38
+ * Description: 
+ *
+ */
+
 #include <cassert>
 #include <sstream>
 #include <string>
 
 #include "chen_solver/util/logger.h"
 
-int main()
-{
-    auto& logger = chen_solver::Logger::instance();
-
-    {
+int main() {
+    auto &logger = chen_solver::Logger::instance(); {
         std::ostringstream oss;
         logger.reset();
         logger.setOutputStream(oss);
@@ -20,9 +25,7 @@ int main()
         logger.warn("tightened variable bound");
 
         assert(oss.str() == "[WARN] tightened variable bound\n");
-    }
-
-    {
+    } {
         std::ostringstream oss;
         logger.reset();
         logger.setOutputStream(oss);

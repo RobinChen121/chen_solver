@@ -1,10 +1,11 @@
-/*
- * Created by Zhen Chen on 2026/8/19.
+/**
+ * Author: Zhen Chen
  * Email: chen.zhen5526@gmail.com
+ * Created on: 2026/08/20, 13:03
  * Description: 
  *
- *
  */
+
 
 #include "chen_solver/io/read_file.h"
 
