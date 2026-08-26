@@ -19,7 +19,7 @@
 #include "chen_solver/core/model.h"
 
 namespace chen_solver {
-    Model read(const std::string &path) {
+    ChenModel read(const std::string &path) {
         const auto pos = path.find_last_of('.');
         if (pos == std::string::npos)
             throw std::runtime_error("File has no extension: " + path);
@@ -122,13 +122,13 @@ namespace chen_solver {
             return value;
         }
 
-        void setLpBound(Model &model, const ChenInt col, const double lower, const double upper) {
+        void setLpBound(ChenModel &model, const ChenInt col, const double lower, const double upper) {
             // model.free_var[col] = is_free;
             model.setVariableLb(col, lower);
             model.setVariableUb(col, upper);
         }
 
-        std::vector<LinearTerm> parseLinearExpression(const std::string &expr, Model &model) {
+        std::vector<LinearTerm> parseLinearExpression(const std::string &expr, ChenModel &model) {
             std::map<ChenInt, double> coefficients;
             size_t pos = 0;
 
@@ -195,7 +195,7 @@ namespace chen_solver {
             return terms;
         }
 
-        void parseLpBoundLine(const std::string &line, Model &model) {
+        void parseLpBoundLine(const std::string &line, ChenModel &model) {
             std::string s = removeOptionalLabel(trim(line));
             if (s.empty())
                 return;
@@ -267,12 +267,12 @@ namespace chen_solver {
         }
     } // namespace
 
-    Model readLP(const std::string &path) {
+    ChenModel readLP(const std::string &path) {
         std::ifstream file(path);
         if (!file)
             throw std::runtime_error("Cannot open LP file: " + path);
 
-        Model model;
+        ChenModel model;
         enum class Section { None, Objective, Constraints, Bounds, Generals, Binaries };
         auto section = Section::None;
 
@@ -325,14 +325,14 @@ namespace chen_solver {
             const int sense = operator_ == "<=" ? 0 : (operator_ == ">=" ? 1 : 2);
 
             if (sense == 0)
-                model.addLinearConstraint(parseLinearExpression(lhs_text, model), -INF, rhs,
-                                          con_name);
+                model.addLineConstr(parseLinearExpression(lhs_text, model), -INF, rhs,
+                                    con_name);
             else if (sense == 1)
-                model.addLinearConstraint(parseLinearExpression(lhs_text, model), rhs, INF,
-                                          con_name);
+                model.addLineConstr(parseLinearExpression(lhs_text, model), rhs, INF,
+                                    con_name);
             else
-                model.addLinearConstraint(parseLinearExpression(lhs_text, model), rhs, rhs,
-                                          con_name);
+                model.addLineConstr(parseLinearExpression(lhs_text, model), rhs, rhs,
+                                    con_name);
 
             // 解析完成后清空缓冲区
             text.clear();
@@ -434,7 +434,7 @@ namespace chen_solver {
         return model;
     }
 
-    Model readMPS(const std::string &path) {
+    ChenModel readMPS(const std::string &path) {
         std::ifstream file(path);
         if (!file.is_open())
             throw std::runtime_error("Cannot open MPS file: " + path);
@@ -469,7 +469,7 @@ namespace chen_solver {
         std::map<std::string, bool> is_int_marker;
 
         //----------------------------------------
-        Model model;
+        ChenModel model;
         model.setObjectiveSense(ObjSense::Minimize);
         std::string line;
         bool in_integer_section = false;
@@ -677,7 +677,7 @@ namespace chen_solver {
                 type = VarType::Integer;
 
             std::string name = col_name;
-            model.addVariable(lb, ub, type, name);
+            model.addVar(lb, ub, type, name);
         }
 
         //----------------------------------------
@@ -745,7 +745,7 @@ namespace chen_solver {
             }
 
             if (type != 'N') {
-                model.addLinearConstraint(terms, lhs_bound, rhs_bound, name);
+                model.addLineConstr(terms, lhs_bound, rhs_bound, name);
             }
         }
 

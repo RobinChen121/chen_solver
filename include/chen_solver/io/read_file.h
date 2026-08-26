@@ -14,11 +14,11 @@
 #include "chen_solver/core/model.h"
 
 namespace chen_solver {
-    Model readLP(const std::string &path);
+    ChenModel readLP(const std::string &path);
 
-    Model readMPS(const std::string &path);
+    ChenModel readMPS(const std::string &path);
 
-    Model read(const std::string &path);
+    ChenModel read(const std::string &path);
 }
 
 #endif //CHEN_SOLVER_READ_FILE_H
