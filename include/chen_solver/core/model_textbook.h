@@ -13,7 +13,6 @@
 
 #include "chen_solver/core/matrix.h"
 
-namespace chen_solver {
     struct SimplexTableau {
         int phase{};
         int iteration{};
@@ -91,5 +90,4 @@ namespace chen_solver {
             original_obj_sense = obj_sense;
         };
     };
-}
 #endif //CHEN_SOLVER_MODEL_TEXTBOOK_H

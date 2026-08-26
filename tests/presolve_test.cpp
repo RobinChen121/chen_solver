@@ -13,17 +13,17 @@
 int main()
 {
     {
-        chen_solver::ChenModel model;
-        model.setObjectiveSense(chen_solver::ObjSense::Minimize);
-        const auto x = model.addVar(1.0, 1.0, chen_solver::VarType::Continuous, "x");
-        const auto y = model.addVar(0.0, 10.0, chen_solver::VarType::Continuous, "y");
-        const auto z = model.addVar(0.0, 10.0, chen_solver::VarType::Continuous, "z");
+        ChenModel model;
+        model.setObjectiveSense(ObjSense::Minimize);
+        const auto x = model.addVar(1.0, 1.0, VarType::Continuous, "x");
+        const auto y = model.addVar(0.0, 10.0, VarType::Continuous, "y");
+        const auto z = model.addVar(0.0, 10.0, VarType::Continuous, "z");
         model.setObjectiveCoefficient(x.col(), 2.0);
         model.setObjectiveCoefficient(y.col(), 3.0);
-        model.addLineConstr({{x.col(), 1.0}, {y.col(), 1.0}, {z.col(), 1.0}}, -chen_solver::INF, 5.0, "cap");
+        model.addLineConstr({{x.col(), 1.0}, {y.col(), 1.0}, {z.col(), 1.0}}, -INF, 5.0, "cap");
 
-        const auto report = chen_solver::presolveLinearProgram(model);
-        assert(report.result == chen_solver::PresolveResult::Presolved);
+        const auto report = presolveLinearProgram(model);
+        assert(report.result == PresolveResult::Presolved);
         assert(report.presolved_model.numVariables() == 2);
         assert(report.presolved_model.numConstraints() == 1);
         assert(report.objective_offset_shift == 2.0);
@@ -47,21 +47,21 @@ int main()
         assert(cons[0].ub == 4.0);
     }
     {
-        chen_solver::ChenModel model;
-        const auto x = model.addVar(0.0, 1.0, chen_solver::VarType::Continuous, "x");
-        model.addLineConstr({{x.col(), 1.0}}, 2.0, chen_solver::INF, "need_more");
+        ChenModel model;
+        const auto x = model.addVar(0.0, 1.0, VarType::Continuous, "x");
+        model.addLineConstr({{x.col(), 1.0}}, 2.0, INF, "need_more");
 
-        const auto report = chen_solver::presolveLinearProgram(model);
-        assert(report.result == chen_solver::PresolveResult::PrimalInfeasible);
+        const auto report = presolveLinearProgram(model);
+        assert(report.result == PresolveResult::PrimalInfeasible);
     }
     {
-        chen_solver::ChenModel model;
-        model.setObjectiveSense(chen_solver::ObjSense::Minimize);
-        const auto x = model.addVar(0.0, chen_solver::INF, chen_solver::VarType::Continuous, "x");
+        ChenModel model;
+        model.setObjectiveSense(ObjSense::Minimize);
+        const auto x = model.addVar(0.0, INF, VarType::Continuous, "x");
         model.setObjectiveCoefficient(x.col(), -1.0);
 
-        const auto report = chen_solver::presolveLinearProgram(model);
-        assert(report.result == chen_solver::PresolveResult::DualInfeasible);
+        const auto report = presolveLinearProgram(model);
+        assert(report.result == PresolveResult::DualInfeasible);
     }
 
     return 0;

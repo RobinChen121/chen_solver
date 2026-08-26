@@ -13,8 +13,6 @@
 
 #include "chen_solver/core/model.h"
 
-namespace chen_solver
-{
     enum class PresolveResult : uint8_t
     {
         NotPresolved = 0,
@@ -39,6 +37,5 @@ namespace chen_solver
     };
 
     [[nodiscard]] PresolveReport presolveLinearProgram(const ChenModel& model);
-}
 
 #endif //CHEN_SOLVER_PRESOLVE_H

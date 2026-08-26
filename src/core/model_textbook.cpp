@@ -7,7 +7,3 @@
  */
 
 #include "chen_solver/core/model_textbook.h"
-
-
-namespace chen_solver {
-}

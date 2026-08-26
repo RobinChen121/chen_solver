@@ -30,7 +30,6 @@
 // row_indices = {1, 3, 0, 2, 3}
 // col_ptr = {0, 1, 2, 3, 5}, col[i+1]-col[i] equals the number of non-zeros in column i
 
-namespace chen_solver {
     struct CSC {
         std::vector<double> values{}; // non zeros values
         std::vector<ChenInt> row_indices{}; // row indices for the non-zero values
@@ -48,5 +47,4 @@ namespace chen_solver {
             : values(num_non_zero), row_indices(num_non_zero), col_ptr(num_col + 1) {
         }
     };
-} // namespace chen_solver
 #endif //CHEN_SOLVER_MATRIX_H

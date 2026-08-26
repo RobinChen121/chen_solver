@@ -14,8 +14,6 @@
 #include <utility>
 #include <vector>
 
-namespace chen_solver
-{
     namespace
     {
         struct RowState
@@ -496,4 +494,3 @@ namespace chen_solver
         report.result = changed ? PresolveResult::Presolved : PresolveResult::NotPresolved;
         return report;
     }
-} // namespace chen_solver

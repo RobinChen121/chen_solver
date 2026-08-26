@@ -20,8 +20,6 @@
 #include "linear_constraint.h"
 #include "variable.h"
 
-namespace chen_solver
-{
     // general model for the industrial solver
     class ChenModel
     {
@@ -176,6 +174,4 @@ namespace chen_solver
         // 求解
         void optimize();
     };
-} // namespace chen_solver
-
 #endif //CHEN_SOLVER_MODEL_H

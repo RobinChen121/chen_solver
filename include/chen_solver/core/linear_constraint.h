@@ -16,7 +16,6 @@
 #include "chen_solver/config.h"
 #include "linear_term.h"
 
-namespace chen_solver {
     struct LinearConstraint {
         ChenUInt id{};
         std::string name;
@@ -31,6 +30,4 @@ namespace chen_solver {
             lhs.reserve(static_cast<std::size_t>(reserve_terms));
         }
     };
-} // namespace chen_solver
-
 #endif //CHEN_SOLVER_LINEAR_CONSTRAINT_H

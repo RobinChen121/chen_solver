@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20) # 指定 CMake 最低版本要求，避免低版本语法不兼容
-project(chen_solver VERSION 0.1.0 LANGUAGES CXX) # 定义项目名、版本号和启用的语言（C++）
+project(chen_solver VERSION 1.0.0 LANGUAGES CXX) # 定义项目名、版本号和启用的语言（C++）
 
 include(GNUInstallDirs) # 引入标准安装目录变量，如 bin、lib、include
 
@@ -36,6 +36,9 @@ add_library(chen_solver_core # 创建核心静态库 chen_solver_core，承载�
         src/presolve/presolve.cpp # 将预处理实现编译进库
         src/util/logger.cpp # 将日志工具实现编译进库
 ) # 结束库目标源文件列表
+target_compile_definitions(chen_solver_core
+        PUBLIC CHEN_SOLVER_VERSION="${PROJECT_VERSION}" # 为核心库定义一个宏 CHEN_SOLVER_VERSION，值为项目版本号，供外部使用
+)
 add_library(chen_solver::core ALIAS chen_solver_core) # 为核心库创建命名空间别名，方便外部统一链接
 # 下吗是设置搜索头文件 h 的路径，上面 add_library() 命令只会把 cpp 文件编译进库，但外部使用该库时还需要知道头文件在哪里
 target_include_directories(chen_solver_core # 为 chen_solver_core 设置头文件搜索路径
@@ -54,11 +57,11 @@ target_link_libraries(chen_solver PRIVATE chen_solver_core) # 可执行程序私
 chen_solver_enable_warnings(chen_solver) # 为 CLI 目标启用统一警告策略
 
 if (CHEN_SOLVER_BUILD_EXAMPLES) # 当开关开启时构建示例程序
-    add_executable(chen_solver_basic_example # 创建基础示例可执行目标
-            examples/basic_model.cpp # 示例入口源文件
+    add_executable(chen_solver_example # 创建基础示例可执行目标
+            examples/basic_lp.cpp # 示例入口源文件
     ) # 结束示例可执行目标源文件列表
-    target_link_libraries(chen_solver_basic_example PRIVATE chen_solver_core) # 示例程序私有链接核心库
-    chen_solver_enable_warnings(chen_solver_basic_example) # 为示例目标启用统一警告策略
+    target_link_libraries(chen_solver_example PRIVATE chen_solver_core) # 示例程序私有链接核心库
+    chen_solver_enable_warnings(chen_solver_example) # 为示例目标启用统一警告策略
 endif () # 结束示例构建条件
 
 # 测试相关配置

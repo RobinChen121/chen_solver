@@ -21,7 +21,6 @@
 
 #include "chen_solver/config.h"
 
-namespace chen_solver {
     struct Variable {
         ChenUInt id{};
         std::string name;
@@ -29,6 +28,4 @@ namespace chen_solver {
         double ub{INF};
         VarType var_type{VarType::Continuous};
     };
-} // namespace chen_solver
-
 #endif //CHEN_SOLVER_VARIABLE_H

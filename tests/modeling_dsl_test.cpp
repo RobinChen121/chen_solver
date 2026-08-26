@@ -12,15 +12,15 @@
 
 int main()
 {
-    chen_solver::ChenModel model;
-    const auto x = model.addVar(0.0, 10.0, chen_solver::VarType::Continuous, "x");
-    const auto y = model.addVar(1.0, 9.0, chen_solver::VarType::Continuous, "y");
+    ChenModel model;
+    const auto x = model.addVar(0.0, 10.0, VarType::Continuous, "x");
+    const auto y = model.addVar(1.0, 9.0, VarType::Continuous, "y");
 
-    model.setObjective(2.0 * x + y + 5.0, chen_solver::ObjSense::Maximize);
+    model.setObjective(2.0 * x + y + 5.0, ObjSense::Maximize);
 
     const auto c0 = model.addLineConstr(2.0 * x + 3.0 * y <= 10.0, "cap");
     const auto c1 = model.addLineConstr(x - y == 1.0);
-    const auto c2 = model.addLineConstr(chen_solver::range(-1.0, x + y + 2.0, 4.0), "rng");
+    const auto c2 = model.addLineConstr(range(-1.0, x + y + 2.0, 4.0), "rng");
     const auto c3 = model.addLineConstr(3.0 <= x + y);
 
     assert(c0 == 0);
@@ -29,13 +29,13 @@ int main()
     assert(c3 == 3);
     assert(model.numVariables() == 2);
     assert(model.numConstraints() == 4);
-    assert(model.objectiveSense() == chen_solver::ObjSense::Maximize);
+    assert(model.objectiveSense() == ObjSense::Maximize);
     assert(model.getObjectiveCoefficient(x.col()) == 2.0);
     assert(model.getObjectiveCoefficient(y.col()) == 1.0);
     assert(model.objectiveOffset() == 5.0);
 
     const auto& constraints = model.constraints();
-    assert(constraints[0].lb <= -chen_solver::INF / 2.0);
+    assert(constraints[0].lb <= -INF / 2.0);
     assert(constraints[0].ub == 10.0);
     assert(constraints[0].lhs.size() == 2);
     assert(constraints[1].lb == 1.0);
@@ -43,7 +43,7 @@ int main()
     assert(constraints[2].lb == -3.0);
     assert(constraints[2].ub == 2.0);
     assert(constraints[3].lb == 3.0);
-    assert(constraints[3].ub >= chen_solver::INF / 2.0);
+    assert(constraints[3].ub >= INF / 2.0);
     assert(model.checkValid());
     return 0;
 }

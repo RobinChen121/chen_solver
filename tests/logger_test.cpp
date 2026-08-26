@@ -13,13 +13,13 @@
 #include "chen_solver/util/logger.h"
 
 int main() {
-    auto &logger = chen_solver::Logger::instance(); {
+    auto &logger = Logger::instance(); {
         std::ostringstream oss;
         logger.reset();
         logger.setOutputStream(oss);
         logger.enableTimestamps(false);
         logger.enableSourceLocation(false);
-        logger.setLevel(chen_solver::LogLevel::Info);
+        logger.setLevel(LogLevel::Info);
 
         logger.debug("hidden debug line");
         logger.warn("tightened variable bound");
@@ -31,13 +31,14 @@ int main() {
         logger.setOutputStream(oss);
         logger.enableTimestamps(false);
         logger.enableSourceLocation(true);
-        logger.setLevel(chen_solver::LogLevel::Trace);
+        logger.setLevel(LogLevel::Trace);
 
         logger.info("presolve started");
 
         const std::string output = oss.str();
-        assert(output.find("[INFO] presolve started") != std::string::npos);
+        assert(output.find("presolve started") != std::string::npos);
         assert(output.find("logger_test.cpp:") != std::string::npos);
+        assert(output.find("[INFO]") == std::string::npos);
     }
 
     logger.reset();

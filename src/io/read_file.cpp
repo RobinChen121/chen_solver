@@ -18,7 +18,6 @@
 
 #include "chen_solver/core/model.h"
 
-namespace chen_solver {
     ChenModel read(const std::string &path) {
         const auto pos = path.find_last_of('.');
         if (pos == std::string::npos)
@@ -751,4 +750,3 @@ namespace chen_solver {
 
         return model;
     }
-}
