@@ -9,17 +9,8 @@
 #ifndef CHEN_SOLVER_PRESOLVE_H
 #define CHEN_SOLVER_PRESOLVE_H
 
-#include <vector>
-
 #include "chen_solver/core/model.h"
-
-    enum class PresolveResult : uint8_t
-    {
-        NotPresolved = 0,
-        Presolved = 1,
-        PrimalInfeasible = 2,
-        DualInfeasible = 3,
-    };
+#include "chen_solver/presolve/presolve_types.h"
 
     struct PresolveReport
     {
@@ -29,6 +20,7 @@
         std::vector<ChenInt> original_to_presolved_col;
         std::vector<bool> variable_is_fixed;
         std::vector<double> fixed_values;
+        std::vector<PresolveAction> actions;
 
         [[nodiscard]] bool hasReducedModel() const noexcept
         {
@@ -36,6 +28,7 @@
         }
     };
 
+    [[nodiscard]] PresolveReport presolveLP(const ChenModel& model);
     [[nodiscard]] PresolveReport presolveLinearProgram(const ChenModel& model);
 
 #endif //CHEN_SOLVER_PRESOLVE_H

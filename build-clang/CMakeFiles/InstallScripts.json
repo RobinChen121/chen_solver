@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"D:/chenzhen/chen_solver/build-clang/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

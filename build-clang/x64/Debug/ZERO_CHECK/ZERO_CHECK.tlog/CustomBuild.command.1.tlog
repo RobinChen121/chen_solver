@@ -1,0 +1,10 @@
+^D:\CHENZHEN\CHEN_SOLVER\BUILD-CLANG\CMAKEFILES\A99D6FBE8D54A19F433D1D667FC2449F\GENERATE.STAMP.RULE
+setlocal
+"D:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SD:/chenzhen/chen_solver -BD:/chenzhen/chen_solver/build-clang --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/chenzhen/chen_solver/build-clang/chen_solver.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

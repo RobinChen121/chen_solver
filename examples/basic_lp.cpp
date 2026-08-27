@@ -13,7 +13,7 @@
 int main() {
     ChenEnv env;
     env.setOutputFlag(true);
-    env.writeLog("basic_lp.log");
+    // env.writeLog("basic_lp.log");
     ChenModel model(env);
     const auto x0 = model.addVar(0.0, 4.0, VarType::Continuous, "x0");
     const auto x1 = model.addVar(1.0, INF, VarType::Continuous, "x1");

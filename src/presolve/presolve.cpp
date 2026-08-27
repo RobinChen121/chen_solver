@@ -16,6 +16,7 @@
 
     namespace
     {
+        // 约束条件的状态
         struct RowState
         {
             std::string name;
@@ -101,12 +102,15 @@
 
         void fixVariable(const ChenInt col,
                          const double value,
+                         const std::string& reason,
+                         const std::vector<Variable>& variables,
                          std::vector<bool>& active_vars,
                          std::vector<double>& var_lb,
                          std::vector<double>& var_ub,
                          std::vector<double>& objective,
                          std::vector<bool>& variable_is_fixed,
                          std::vector<double>& fixed_values,
+                         std::vector<PresolveAction>& actions,
                          double& objective_offset,
                          bool& changed)
         {
@@ -120,8 +124,24 @@
             fixed_values[col] = value;
             var_lb[col] = value;
             var_ub[col] = value;
-            objective_offset += objective[col] * value;
+            const double objective_shift = objective[col] * value;
+            objective_offset += objective_shift;
             objective[col] = 0.0;
+            actions.push_back({
+                .type = PresolveActionType::FixedVariable,
+                .variable_col = col,
+                .variable_name = variables[col].name,
+                .constraint_name = "",
+                .value = value,
+                .old_bound = 0.0,
+                .new_bound = 0.0,
+                .lower_shift = 0.0,
+                .upper_shift = 0.0,
+                .objective_shift = objective_shift,
+                .old_objective_sense = ObjSense::Minimize,
+                .new_objective_sense = ObjSense::Minimize,
+                .detail = reason
+            });
             changed = true;
         }
 
@@ -143,7 +163,7 @@
         }
     } // namespace
 
-    PresolveReport presolveLinearProgram(const ChenModel& model)
+    PresolveReport presolveLP(const ChenModel& model)
     {
         PresolveReport report;
         const auto& variables = model.variables();
@@ -157,8 +177,12 @@
         std::vector<double> objective(num_vars, 0.0);
         std::vector<bool> variable_is_fixed(num_vars, false);
         std::vector<double> fixed_values(num_vars, 0.0);
+        std::vector<PresolveAction> actions;
         std::vector<RowState> rows;
         rows.reserve(num_cons);
+        ObjSense presolved_objective_sense = model.objectiveSense();
+        double objective_offset = model.objectiveOffset();
+        bool changed = false;
 
         for (std::size_t col = 0; col < num_vars; ++col)
         {
@@ -181,6 +205,32 @@
             {
                 objective[col] = coef;
             }
+        }
+
+        if (presolved_objective_sense == ObjSense::Maximize)
+        {
+            for (double& coef : objective)
+            {
+                coef = -coef;
+            }
+            objective_offset = -objective_offset;
+            actions.push_back({
+                .type = PresolveActionType::NormalizedObjectiveSense,
+                .variable_col = -1,
+                .variable_name = "",
+                .constraint_name = "",
+                .value = 0.0,
+                .old_bound = 0.0,
+                .new_bound = 0.0,
+                .lower_shift = 0.0,
+                .upper_shift = 0.0,
+                .objective_shift = 0.0,
+                .old_objective_sense = ObjSense::Maximize,
+                .new_objective_sense = ObjSense::Minimize,
+                .detail = "Converted maximization objective to minimization form"
+            });
+            presolved_objective_sense = ObjSense::Minimize;
+            changed = true;
         }
 
         for (const auto& constraint : constraints)
@@ -210,8 +260,6 @@
             rows.push_back(std::move(row));
         }
 
-        double objective_offset = model.objectiveOffset();
-        bool changed = false;
         bool pass_changed = false;
 
         do
@@ -233,8 +281,10 @@
 
                 if (nearlyEqual(var_lb[col], var_ub[col]))
                 {
-                    fixVariable(col, var_lb[col], active_vars, var_lb, var_ub, objective,
-                                variable_is_fixed, fixed_values, objective_offset, pass_changed);
+                    fixVariable(col, var_lb[col], "Variable fixed by identical lower and upper bounds",
+                                variables, active_vars, var_lb, var_ub, objective,
+                                variable_is_fixed, fixed_values, actions, objective_offset,
+                                pass_changed);
                 }
             }
 
@@ -261,6 +311,8 @@
 
                 if (std::abs(fixed_shift) > EPS)
                 {
+                    const bool has_finite_lb = !isNegInf(row.lb);
+                    const bool has_finite_ub = !isPosInf(row.ub);
                     if (!isNegInf(row.lb))
                     {
                         row.lb -= fixed_shift;
@@ -269,6 +321,21 @@
                     {
                         row.ub -= fixed_shift;
                     }
+                    actions.push_back({
+                        .type = PresolveActionType::ShiftedConstraintBounds,
+                        .variable_col = -1,
+                        .variable_name = "",
+                        .constraint_name = row.name,
+                        .value = 0.0,
+                        .old_bound = 0.0,
+                        .new_bound = 0.0,
+                        .lower_shift = has_finite_lb ? fixed_shift : 0.0,
+                        .upper_shift = has_finite_ub ? fixed_shift : 0.0,
+                        .objective_shift = 0.0,
+                        .old_objective_sense = ObjSense::Minimize,
+                        .new_objective_sense = ObjSense::Minimize,
+                        .detail = "Removed fixed-variable contribution from constraint"
+                    });
                 }
                 row.terms = std::move(filtered_terms);
 
@@ -287,6 +354,21 @@
                         return report;
                     }
                     row.active = false;
+                    actions.push_back({
+                        .type = PresolveActionType::RemovedEmptyConstraint,
+                        .variable_col = -1,
+                        .variable_name = "",
+                        .constraint_name = row.name,
+                        .value = 0.0,
+                        .old_bound = 0.0,
+                        .new_bound = 0.0,
+                        .lower_shift = 0.0,
+                        .upper_shift = 0.0,
+                        .objective_shift = 0.0,
+                        .old_objective_sense = ObjSense::Minimize,
+                        .new_objective_sense = ObjSense::Minimize,
+                        .detail = "Constraint became empty and was removed"
+                    });
                     pass_changed = true;
                     continue;
                 }
@@ -314,6 +396,21 @@
                 if (lower_always_satisfied && upper_always_satisfied)
                 {
                     row.active = false;
+                    actions.push_back({
+                        .type = PresolveActionType::RemovedRedundantConstraint,
+                        .variable_col = -1,
+                        .variable_name = "",
+                        .constraint_name = row.name,
+                        .value = 0.0,
+                        .old_bound = 0.0,
+                        .new_bound = 0.0,
+                        .lower_shift = 0.0,
+                        .upper_shift = 0.0,
+                        .objective_shift = 0.0,
+                        .old_objective_sense = ObjSense::Minimize,
+                        .new_objective_sense = ObjSense::Minimize,
+                        .detail = "Constraint activity stays within its bounds and was removed"
+                    });
                     pass_changed = true;
                     continue;
                 }
@@ -358,11 +455,41 @@
 
                 if (new_lb > var_lb[col] + EPS)
                 {
+                    actions.push_back({
+                        .type = PresolveActionType::TightenedVariableLowerBound,
+                        .variable_col = col,
+                        .variable_name = variables[col].name,
+                        .constraint_name = row.name,
+                        .value = 0.0,
+                        .old_bound = var_lb[col],
+                        .new_bound = new_lb,
+                        .lower_shift = 0.0,
+                        .upper_shift = 0.0,
+                        .objective_shift = 0.0,
+                        .old_objective_sense = ObjSense::Minimize,
+                        .new_objective_sense = ObjSense::Minimize,
+                        .detail = "Singleton constraint tightened the variable lower bound"
+                    });
                     var_lb[col] = new_lb;
                     pass_changed = true;
                 }
                 if (new_ub < var_ub[col] - EPS)
                 {
+                    actions.push_back({
+                        .type = PresolveActionType::TightenedVariableUpperBound,
+                        .variable_col = col,
+                        .variable_name = variables[col].name,
+                        .constraint_name = row.name,
+                        .value = 0.0,
+                        .old_bound = var_ub[col],
+                        .new_bound = new_ub,
+                        .lower_shift = 0.0,
+                        .upper_shift = 0.0,
+                        .objective_shift = 0.0,
+                        .old_objective_sense = ObjSense::Minimize,
+                        .new_objective_sense = ObjSense::Minimize,
+                        .detail = "Singleton constraint tightened the variable upper bound"
+                    });
                     var_ub[col] = new_ub;
                     pass_changed = true;
                 }
@@ -392,13 +519,15 @@
                 if (std::abs(coef) <= EPS)
                 {
                     const double value = chooseFeasibleValue(var_lb[col], var_ub[col]);
-                    fixVariable(col, value, active_vars, var_lb, var_ub, objective,
-                                variable_is_fixed, fixed_values, objective_offset, pass_changed);
+                    fixVariable(col, value, "Unused variable fixed to a feasible value",
+                                variables, active_vars, var_lb, var_ub, objective,
+                                variable_is_fixed, fixed_values, actions, objective_offset,
+                                pass_changed);
                     continue;
                 }
 
                 double value = 0.0;
-                switch (model.objectiveSense())
+                switch (presolved_objective_sense)
                 {
                 case ObjSense::Minimize:
                     if (coef > 0.0)
@@ -442,8 +571,10 @@
                     break;
                 }
 
-                fixVariable(col, value, active_vars, var_lb, var_ub, objective,
-                            variable_is_fixed, fixed_values, objective_offset, pass_changed);
+                fixVariable(col, value, "Unconstrained variable fixed by objective direction",
+                            variables, active_vars, var_lb, var_ub, objective,
+                            variable_is_fixed, fixed_values, actions, objective_offset,
+                            pass_changed);
             }
 
             changed = changed || pass_changed;
@@ -454,8 +585,9 @@
         report.variable_is_fixed = variable_is_fixed;
         report.fixed_values = fixed_values;
         report.objective_offset_shift = objective_offset - model.objectiveOffset();
+        report.actions = std::move(actions);
 
-        report.presolved_model.setObjectiveSense(model.objectiveSense());
+        report.presolved_model.setObjectiveSense(presolved_objective_sense);
         report.presolved_model.setObjectiveOffset(objective_offset);
 
         for (std::size_t old_col = 0; old_col < num_vars; ++old_col)
@@ -493,4 +625,9 @@
 
         report.result = changed ? PresolveResult::Presolved : PresolveResult::NotPresolved;
         return report;
+    }
+
+    PresolveReport presolveLinearProgram(const ChenModel& model)
+    {
+        return presolveLP(model);
     }

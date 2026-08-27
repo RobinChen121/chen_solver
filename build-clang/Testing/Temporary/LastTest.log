@@ -1,0 +1,88 @@
+Start testing: Aug 27 09:07 GMT Summer Time
+----------------------------------------------------------
+1/4 Testing: model_test
+1/4 Test: model_test
+Command: "D:/chenzhen/chen_solver/build-clang/Debug/chen_solver_model_test.exe"
+Directory: D:/chenzhen/chen_solver/build-clang
+"model_test" start time: Aug 27 09:07 GMT Summer Time
+Output:
+----------------------------------------------------------
+**************************************************
+Chen Solver version 1.0.0
+Build: Aug 27 2026 09:06:21
+Platform: Windows 6.2
+CPU model: Intel64 Family 6 Model 186 Stepping 3, GenuineIntel
+Thread count: 12 physical cores, 12 logical processors, using up to 12 threads
+
+**************************************************
+Objective sense: Minimize
+Optimize a model with 2 cols (variables); 2 rows (constraints); 3 nonzeros
+Coefficient ranges:
+  Matrix (constraint left-hand side coefficients)  [1e+00, 1e+00]
+  Cost (objective coefficients)    [0e+00, 0e+00]
+  Bound (variable bounds)   [0e+00, 1e+00]
+  RHS (constraint right-hand side coefficients)     [1e+00, 1e+01]
+Presolve started
+Presolve tightened lower bound of x0 from 0.000000e+00 to 1.000000e+00 (Singleton constraint tightened the variable lower bound)
+Presolve fixed variable x0 = 1.000000e+00 (Variable fixed by identical lower and upper bounds)
+Presolve shifted constraint cover by [1.000000e+00, 0.000000e+00] (Removed fixed-variable contribution from constraint)
+Presolve removed constraint cover (Constraint became empty and was removed)
+Presolve shifted constraint sum by [0.000000e+00, 1.000000e+00] (Removed fixed-variable contribution from constraint)
+Presolve tightened upper bound of x2 from inf to 9.000000e+00 (Singleton constraint tightened the variable upper bound)
+Presolve removed constraint sum (Constraint activity stays within its bounds and was removed)
+Presolve fixed variable x2 = 0.000000e+00 (Unused variable fixed to a feasible value)
+Presolve reduced the model to 0 cols and 0 rows.
+<end of output>
+Test time =   0.03 sec
+----------------------------------------------------------
+Test Passed.
+"model_test" end time: Aug 27 09:07 GMT Summer Time
+"model_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/4 Testing: presolve_test
+2/4 Test: presolve_test
+Command: "D:/chenzhen/chen_solver/build-clang/Debug/chen_solver_presolve_test.exe"
+Directory: D:/chenzhen/chen_solver/build-clang
+"presolve_test" start time: Aug 27 09:07 GMT Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"presolve_test" end time: Aug 27 09:07 GMT Summer Time
+"presolve_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/4 Testing: logger_test
+3/4 Test: logger_test
+Command: "D:/chenzhen/chen_solver/build-clang/Debug/chen_solver_logger_test.exe"
+Directory: D:/chenzhen/chen_solver/build-clang
+"logger_test" start time: Aug 27 09:07 GMT Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"logger_test" end time: Aug 27 09:07 GMT Summer Time
+"logger_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/4 Testing: modeling_dsl_test
+4/4 Test: modeling_dsl_test
+Command: "D:/chenzhen/chen_solver/build-clang/Debug/chen_solver_modeling_dsl_test.exe"
+Directory: D:/chenzhen/chen_solver/build-clang
+"modeling_dsl_test" start time: Aug 27 09:07 GMT Summer Time
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"modeling_dsl_test" end time: Aug 27 09:07 GMT Summer Time
+"modeling_dsl_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Aug 27 09:07 GMT Summer Time

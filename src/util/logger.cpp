@@ -24,15 +24,18 @@
 #include <windows.h>
 #endif
 
-namespace {
+namespace
+{
     // The logger shares a single mutex across all log calls so concurrent model
     // solves may emit messages without interleaving corruptly.
-    std::mutex &loggerMutex() {
+    std::mutex& loggerMutex()
+    {
         static std::mutex mutex;
         return mutex;
     }
 
-    [[nodiscard]] std::string formatTimestamp() {
+    [[nodiscard]] std::string formatTimestamp()
+    {
         // Use system_clock for wall-clock time. time_t is the seconds-based value
         // required by localtime_*; this conversion is what allows formatted timestamps.
         const auto now = std::chrono::system_clock::now();
@@ -52,19 +55,24 @@ namespace {
         return oss.str();
     }
 
-    void writeLogLine(std::ostream &output,
+    // std::ofstream is a subclass of std::ostream, which represents an output stream that writes to a file.
+    // that is why we can use std::ofstream to write log messages to a file, and std::ostream to write log messages to the console or other output streams.
+    void writeLogLine(std::ostream& output,
                       const LogLevel level,
                       const bool include_timestamp,
                       const bool include_source_location,
                       const std::string_view message,
-                      const std::source_location &location) {
-        if (include_timestamp) {
+                      const std::source_location& location)
+    {
+        if (include_timestamp)
+        {
             output << "[" << formatTimestamp() << "] ";
         }
         if (level != LogLevel::Off && level != LogLevel::Info)
             output << "[" << toString(level) << "] ";
         output << message;
-        if (include_source_location) {
+        if (include_source_location)
+        {
             output << " (" << location.file_name() << ":" << location.line() << ")";
         }
         output << '\n';
@@ -72,11 +80,13 @@ namespace {
         // flush the output stream to ensure that the log message is written immediately
     }
 
-    [[nodiscard]] unsigned int getPhysicalCores() {
+    [[nodiscard]] unsigned int getPhysicalCores()
+    {
 #if defined(__APPLE__) || defined(__MACH__)
         int count = 0;
         size_t size = sizeof(count);
-        if (sysctlbyname("hw.physicalcpu", &count, &size, nullptr, 0) == 0) {
+        if (sysctlbyname("hw.physicalcpu", &count, &size, nullptr, 0) == 0)
+        {
             return static_cast<unsigned int>(count);
         }
 #elif defined(_WIN32)
@@ -88,55 +98,64 @@ namespace {
         return 1;
     }
 
-    [[nodiscard]] unsigned int getLogicalCores() {
+    [[nodiscard]] unsigned int getLogicalCores()
+    {
         const unsigned int count = std::thread::hardware_concurrency();
         return count > 0 ? count : 1;
     }
 
-    [[nodiscard]] std::string getCpuModel() {
+    [[nodiscard]] std::string getCpuModel()
+    {
 #if defined(__APPLE__) || defined(__MACH__)
         char buffer[256] = {};
         size_t size = sizeof(buffer);
-        if (sysctlbyname("machdep.cpu.brand_string", buffer, &size, nullptr, 0) == 0) {
+        if (sysctlbyname("machdep.cpu.brand_string", buffer, &size, nullptr, 0) == 0)
+        {
             return std::string(buffer);
         }
 #elif defined(_WIN32)
         char buffer[256] = {};
         const DWORD size = GetEnvironmentVariableA("PROCESSOR_IDENTIFIER", buffer, sizeof(buffer));
-        if (size > 0 && size < sizeof(buffer)) {
+        if (size > 0 && size < sizeof(buffer))
+        {
             return std::string(buffer);
         }
         SYSTEM_INFO info{};
         GetNativeSystemInfo(&info);
-        switch (info.wProcessorArchitecture) {
-            case PROCESSOR_ARCHITECTURE_AMD64:
-                return "AMD64 / x86_64";
-            case PROCESSOR_ARCHITECTURE_ARM:
-                return "ARM";
-            case PROCESSOR_ARCHITECTURE_ARM64:
-                return "ARM64";
-            case PROCESSOR_ARCHITECTURE_INTEL:
-                return "x86";
-            default:
-                return "Unknown CPU";
+        switch (info.wProcessorArchitecture)
+        {
+        case PROCESSOR_ARCHITECTURE_AMD64:
+            return "AMD64 / x86_64";
+        case PROCESSOR_ARCHITECTURE_ARM:
+            return "ARM";
+        case PROCESSOR_ARCHITECTURE_ARM64:
+            return "ARM64";
+        case PROCESSOR_ARCHITECTURE_INTEL:
+            return "x86";
+        default:
+            return "Unknown CPU";
         }
 #endif
         return "Unknown CPU";
     }
 
-    [[nodiscard]] std::string getPlatformName() {
+    [[nodiscard]] std::string getPlatformName()
+    {
 #if defined(__APPLE__) || defined(__MACH__)
         utsname info{};
-        if (uname(&info) == 0) {
+        if (uname(&info) == 0)
+        {
             return std::string(info.sysname) + " " + info.release + " " + info.machine;
         }
 #elif defined(_WIN32)
         OSVERSIONINFOA info{};
         info.dwOSVersionInfoSize = sizeof(info);
-        if (GetVersionExA(&info)) {
+        if (GetVersionExA(&info))
+        {
             std::ostringstream oss;
             oss << "Windows " << info.dwMajorVersion << "." << info.dwMinorVersion;
-            if (info.szCSDVersion[0] != '\0') {
+            if (info.szCSDVersion[0] != '\0')
+            {
                 oss << " " << info.szCSDVersion;
             }
             return oss.str();
@@ -144,7 +163,8 @@ namespace {
         return "Windows";
 #else
         utsname info{};
-        if (uname(&info) == 0) {
+        if (uname(&info) == 0)
+        {
             return std::string(info.sysname) + " " + info.release + " " + info.machine;
         }
 #endif
@@ -152,25 +172,28 @@ namespace {
     }
 } // namespace
 
-const char *toString(const LogLevel level) noexcept {
-    switch (level) {
-        case LogLevel::Trace:
-            return "TRACE";
-        case LogLevel::Debug:
-            return "DEBUG";
-        case LogLevel::Info:
-            return "INFO";
-        case LogLevel::Warn:
-            return "WARN";
-        case LogLevel::Error:
-            return "ERROR";
-        case LogLevel::Off:
-            return "OFF";
+const char* toString(const LogLevel level) noexcept
+{
+    switch (level)
+    {
+    case LogLevel::Trace:
+        return "TRACE";
+    case LogLevel::Debug:
+        return "DEBUG";
+    case LogLevel::Info:
+        return "INFO";
+    case LogLevel::Warn:
+        return "WARN";
+    case LogLevel::Error:
+        return "ERROR";
+    case LogLevel::Off:
+        return "OFF";
     }
     return "UNKNOWN";
 }
 
-std::string Logger::getInfo() noexcept {
+std::string Logger::getInfo() noexcept
+{
     // std::ostringstream 和 std::cout 的区别是：std::cout：直接往终端/输出流写
     // std::ostringstream 先往内存里的字符串流里写，最后 oss.str() 取出
     std::ostringstream oss; // 创建一个字符串流对象 oss，用于将多个信息拼接成一个字符串
@@ -183,13 +206,15 @@ std::string Logger::getInfo() noexcept {
     oss << "Platform: " << getPlatformName() << "\n";
     oss << "CPU model: " << getCpuModel() << "\n";
     oss << "Thread count: " << physical << " physical cores, " << logical
-            << " logical processors, using up to " << logical << " threads\n";
+        << " logical processors, using up to " << logical << " threads\n";
     return oss.str();
 }
 
-Logger &Logger::instance() noexcept {
+Logger& Logger::instance() noexcept
+{
     static Logger logger;
-    if (logger.output_ == nullptr) {
+    if (logger.output_ == nullptr)
+    {
         // 表示还没有设置输出流，即第一次调用 instance 时，默认使用 std::cout
         logger.output_ = &std::cout; // clog 是标准库提供的一个日志输出流对象，通常用于输出日志信息，默认输出到标准错误流（stderr），红色字体
         // 其他输出流还有 std::cout（标准输出流，通常用于输出普通信息）和 std::cerr（标准错误流，通常用于输出错误信息）
@@ -202,22 +227,26 @@ Logger &Logger::instance() noexcept {
 // 需要在这些函数中使用互斥锁（mutex）来保护共享资源的访问。std::lock_guard 是一个 RAII 风格的互斥锁管理类，
 // 它在构造时锁定互斥锁，在析构时自动释放锁，
 // 确保在函数退出时自动释放锁，避免死锁和资源泄漏。
-void Logger::setLevel(const LogLevel level) noexcept {
+void Logger::setLevel(const LogLevel level) noexcept
+{
     std::lock_guard lock(loggerMutex()); // 使用 std::lock_guard 来管理互斥锁的生命周期，确保在函数退出时自动释放锁，避免死锁和资源泄漏
     level_ = level;
 }
 
-LogLevel Logger::level() const noexcept {
+LogLevel Logger::level() const noexcept
+{
     std::lock_guard lock(loggerMutex());
     return level_;
 }
 
-void Logger::setOutputStream(std::ostream &stream) noexcept {
+void Logger::setOutputStream(std::ostream& stream) noexcept
+{
     std::lock_guard lock(loggerMutex());
     output_ = &stream;
 }
 
-void Logger::writeLogFile(const std::string &path) {
+void Logger::writeLogFile(const std::string& path)
+{
     std::lock_guard lock(loggerMutex());
     // 关闭之前的文件流，确保不会同时写入多个文件
     file_output_.close();
@@ -226,27 +255,32 @@ void Logger::writeLogFile(const std::string &path) {
     file_output_.open(path, std::ios::out | std::ios::app);
 }
 
-void Logger::enableTimestamps(const bool enable) noexcept {
+void Logger::enableTimestamps(const bool enable) noexcept
+{
     std::lock_guard lock(loggerMutex());
     timestamps_enabled_ = enable;
 }
 
-void Logger::enableSourceLocation(const bool enable) noexcept {
+void Logger::enableSourceLocation(const bool enable) noexcept
+{
     std::lock_guard lock(loggerMutex());
     source_location_enabled_ = enable;
 }
 
-bool Logger::timestampsEnabled() const noexcept {
+bool Logger::timestampsEnabled() const noexcept
+{
     std::lock_guard lock(loggerMutex());
     return timestamps_enabled_;
 }
 
-bool Logger::sourceLocationEnabled() const noexcept {
+bool Logger::sourceLocationEnabled() const noexcept
+{
     std::lock_guard lock(loggerMutex());
     return source_location_enabled_;
 }
 
-void Logger::reset() noexcept {
+void Logger::reset() noexcept
+{
     std::lock_guard lock(loggerMutex());
     level_ = LogLevel::Info;
     output_ = &std::cout;
@@ -256,27 +290,32 @@ void Logger::reset() noexcept {
 }
 
 // 判断是否应该记录日志，主要是根据当前日志级别和传入的日志级别进行比较
-bool Logger::shouldLog(const LogLevel level) const noexcept {
+bool Logger::shouldLog(const LogLevel level) const noexcept
+{
     std::lock_guard lock(loggerMutex());
     return level != LogLevel::Off && level_ != LogLevel::Off &&
-           static_cast<int>(level) >= static_cast<int>(level_);
+        static_cast<int>(level) >= static_cast<int>(level_);
 }
 
 void Logger::log(const LogLevel level,
                  const std::string_view message,
-                 const std::source_location &location) {
+                 const std::source_location& location)
+{
     std::lock_guard lock(loggerMutex());
     if (level == LogLevel::Off || level_ == LogLevel::Off ||
-        static_cast<int>(level) < static_cast<int>(level_)) {
+        static_cast<int>(level) < static_cast<int>(level_))
+    {
         return;
     }
-    if (output_ == nullptr) {
+    if (output_ == nullptr)
+    {
         output_ = &std::cout;
     }
 
     writeLogLine(*output_, level, timestamps_enabled_, source_location_enabled_, message,
                  location);
-    if (file_output_.is_open()) {
+    if (file_output_.is_open())
+    {
         // 如果文件流已经打开，则将日志写入文件
         writeLogLine(file_output_, level, timestamps_enabled_, source_location_enabled_,
                      message, location);
@@ -284,29 +323,32 @@ void Logger::log(const LogLevel level,
 }
 
 void Logger::logHeader(const std::string_view header,
-                       const std::source_location &location) {
-    const std::string separator(50, '*');
-    log(LogLevel::Info, separator, location);
+                       const std::source_location& location)
+{
     log(LogLevel::Info, std::string(header), location);
-    log(LogLevel::Info, separator, location);
 }
 
-void Logger::trace(const std::string_view message, const std::source_location &location) {
+void Logger::trace(const std::string_view message, const std::source_location& location)
+{
     log(LogLevel::Trace, message, location);
 }
 
-void Logger::debug(const std::string_view message, const std::source_location &location) {
+void Logger::debug(const std::string_view message, const std::source_location& location)
+{
     log(LogLevel::Debug, message, location);
 }
 
-void Logger::info(const std::string_view message, const std::source_location &location) {
+void Logger::info(const std::string_view message, const std::source_location& location)
+{
     log(LogLevel::Info, message, location);
 }
 
-void Logger::warn(const std::string_view message, const std::source_location &location) {
+void Logger::warn(const std::string_view message, const std::source_location& location)
+{
     log(LogLevel::Warn, message, location);
 }
 
-void Logger::error(const std::string_view message, const std::source_location &location) {
+void Logger::error(const std::string_view message, const std::source_location& location)
+{
     log(LogLevel::Error, message, location);
 }

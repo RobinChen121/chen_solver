@@ -33,6 +33,12 @@ int main()
         assert(report.original_to_presolved_col[0] == -1);
         assert(report.original_to_presolved_col[1] == 0);
         assert(report.original_to_presolved_col[2] == 1);
+        assert(report.actions.size() == 2);
+        assert(report.actions[0].type == PresolveActionType::FixedVariable);
+        assert(report.actions[0].variable_name == "x");
+        assert(report.actions[0].value == 1.0);
+        assert(report.actions[1].type == PresolveActionType::ShiftedConstraintBounds);
+        assert(report.actions[1].constraint_name == "cap");
 
         const auto& vars = report.presolved_model.variables();
         const auto& cons = report.presolved_model.constraints();
@@ -62,6 +68,19 @@ int main()
 
         const auto report = presolveLinearProgram(model);
         assert(report.result == PresolveResult::DualInfeasible);
+    }
+    {
+        ChenModel model;
+        model.setObjective(2.0 + 3.0 * model.addVar(0.0, 4.0, VarType::Continuous, "x"),
+                           ObjSense::Maximize);
+
+        const auto report = presolveLinearProgram(model);
+        assert(report.result == PresolveResult::Presolved);
+        assert(report.presolved_model.objectiveSense() == ObjSense::Minimize);
+        assert(report.actions.size() >= 2);
+        assert(report.actions[0].type == PresolveActionType::NormalizedObjectiveSense);
+        assert(report.actions[0].old_objective_sense == ObjSense::Maximize);
+        assert(report.actions[0].new_objective_sense == ObjSense::Minimize);
     }
 
     return 0;

@@ -1,0 +1,15 @@
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_core.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_example.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/Experimental.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/Nightly.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/Continuous.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/NightlyMemoryCheck.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_model_test.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_presolve_test.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_logger_test.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/chen_solver_modeling_dsl_test.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/RUN_TESTS.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/INSTALL.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/ALL_BUILD.dir
+D:/chenzhen/chen_solver/build-clang/CMakeFiles/ZERO_CHECK.dir

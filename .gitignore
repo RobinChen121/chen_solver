@@ -25,3 +25,5 @@ compile_commands.json
 *.gcno
 *.profraw
 *.profdata
+build-clang/chen_solver.dir/Debug/chen_solver.tlog/clang-cl.command.1.tlog
+build-clang/x64/Debug/ALL_BUILD/ALL_BUILD.recipe
