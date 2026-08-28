@@ -16,14 +16,16 @@
 
 #include "chen_solver/config.h"
 
-enum class PresolveResult : uint8_t {
+enum class PresolveResult : uint8_t
+{
     NotPresolved = 0,
     Presolved = 1,
     PrimalInfeasible = 2,
     DualInfeasible = 3,
 };
 
-enum class PresolveActionType : uint8_t {
+enum class PresolveActionType : uint8_t
+{
     NormalizedObjectiveSense = 0, // Converted maximization objective to minimization form
     FixedVariable = 1, // Fixed a variable to a specific value due to constraints or bounds
     ShiftedConstraintBounds = 2, // Shifted the bounds of a constraint due to fixed variables
@@ -36,7 +38,8 @@ enum class PresolveActionType : uint8_t {
     // Tightened the upper bound of a variable due to constraints or bounds
 };
 
-struct PresolveAction {
+struct PresolveAction
+{
     PresolveActionType type{PresolveActionType::FixedVariable};
     ChenInt variable_col{-1};
     std::string variable_name;
@@ -49,6 +52,7 @@ struct PresolveAction {
     double objective_shift{0.0};
     ObjSense old_objective_sense{ObjSense::Minimize};
     ObjSense new_objective_sense{ObjSense::Minimize};
+    std::string detail; // Additional details or context about the action
 };
 
 #endif // CHEN_SOLVER_PRESOLVE_TYPES_H

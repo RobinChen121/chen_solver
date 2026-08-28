@@ -79,6 +79,7 @@ namespace {
 
     void fixVariable(const ChenInt col,
                      const double value,
+                     const std::string& reason,
                      const std::vector<Variable> &variables,
                      std::vector<bool> &active_vars,
                      std::vector<double> &var_lb,
@@ -114,6 +115,7 @@ namespace {
             .objective_shift = objective_shift,
             .old_objective_sense = ObjSense::Minimize,
             .new_objective_sense = ObjSense::Minimize,
+
         });
         changed = true;
     }
